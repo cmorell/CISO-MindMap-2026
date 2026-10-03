@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Interactive version of Rafeeq Rehman's CISO MindMap 2026, with explanations and key controls for every topic.">
+<title>CISO MindMap 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-size:14px}
+[hidden]{display:none!important}
+/* Layout: consola a pantalla completa — barra superior, lienzo con zoom/paneo, panel flotante de focos 2026-27 */
+:root{
+  --bg:#EEF1F4; --surface:#FFFFFF; --fg:#18202A; --muted:#5B6776; --line:#CBD3DC; --dot:#D6DDE4; --accent:#1F6FD1; --hit:#E8A317;
+  --b0:#B4413C; --b1:#1F8A96; --b2:#2E8A6A; --b3:#6E7F2A;
+  --b4:#7A4FB0; --b5:#2F5FB3; --b6:#2B7BB9; --b7:#3C8A4A; --b8:#8A7A12; --b9:#A23B7F; --b10:#6B4FB8; --b11:#3F55A8;
+  --display:"Sora",ui-sans-serif,system-ui,sans-serif;
+  --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1319; --surface:#171E27; --fg:#E4E9EF; --muted:#94A1B1; --line:#303A47; --dot:#1E2731; --accent:#6EA8F5; --hit:#F2C14E;
+  --b0:#E0776F; --b1:#63C5D0; --b2:#6FCBA6; --b3:#AFC06A; --b4:#B18BE6; --b5:#7FA3EA; --b6:#72B4E6; --b7:#78C487; --b8:#D2C257; --b9:#DC7DB9; --b10:#A897EA; --b11:#8C9DE3;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1319; --surface:#171E27; --fg:#E4E9EF; --muted:#94A1B1; --line:#303A47; --dot:#1E2731; --accent:#6EA8F5; --hit:#F2C14E;
+  --b0:#E0776F; --b1:#63C5D0; --b2:#6FCBA6; --b3:#AFC06A; --b4:#B18BE6; --b5:#7FA3EA; --b6:#72B4E6; --b7:#78C487; --b8:#D2C257; --b9:#DC7DB9; --b10:#A897EA; --b11:#8C9DE3;
+  color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--line);position:relative;z-index:2}
+.brand{display:flex;flex-direction:column;min-width:0}
+.brand h1{font-family:var(--display);font-size:1.15rem;font-weight:700;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:.78rem}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-left:auto}
+.search{position:relative;display:flex;align-items:center}
+.search input{font:inherit;font-size:.85rem;padding:7px 64px 7px 10px;width:230px;max-width:60vw;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)}
+.search input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.search .count{position:absolute;right:8px;font-family:var(--mono);font-size:.72rem;color:var(--muted);pointer-events:none}
+button{font:inherit;font-size:.8rem;font-weight:500;padding:7px 11px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg);cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+main{flex:1;position:relative;min-height:0}
+#map{width:100%;height:100%;display:block;cursor:grab;
+  background-image:radial-gradient(var(--dot) 1.2px,transparent 1.2px);background-size:22px 22px}
+#map:active{cursor:grabbing}
+.link{fill:none;stroke-width:1.6;opacity:.55}
+.node{cursor:pointer}
+.node rect.box{stroke-width:1.2}
+.node text{font-family:var(--body);font-size:12px;fill:var(--fg)}
+.node.d1 text{font-weight:600;font-size:13px}
+.node.root text{font-family:var(--display);font-weight:700;font-size:15px}
+.node .badge text{font-family:var(--mono);font-size:10px;font-weight:500;fill:var(--surface)}
+.node:focus{outline:none}
+.node:focus-visible rect.box{stroke:var(--accent);stroke-width:2.5}
+.dimmed .node:not(.hit):not(.root){opacity:.28}
+.dimmed .link{opacity:.18}
+.node.hit rect.box{stroke:var(--hit);stroke-width:3}
+.node.current rect.box{stroke-width:4}
+.node .ctl{fill:var(--hit)}
+.node.sel rect.box{stroke:var(--accent);stroke-width:2.5}
+.hint{position:absolute;left:16px;top:12px;font-size:.76rem;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:5px 10px;max-width:calc(100% - 32px);display:flex;align-items:center;gap:6px}
+.hint i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--hit)}
+.info{position:absolute;right:16px;top:12px;width:380px;max-width:calc(100% - 32px);max-height:calc(100% - 24px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 28px rgb(0 0 0 / .14);display:flex;flex-direction:column}
+.info-head{padding:14px 16px 0;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:start}
+.crumb{font-family:var(--mono);font-size:.68rem;color:var(--muted);line-height:1.45;grid-column:1/-1;display:flex;flex-wrap:wrap;gap:2px 6px}
+.crumb span:not(:last-child)::after{content:"›";margin-left:6px}
+.info h2{margin:2px 0 0;font-family:var(--display);font-size:1.02rem;line-height:1.3;font-weight:700;text-wrap:balance;border-left:4px solid var(--bc,var(--accent));padding-left:10px}
+.close{padding:4px 9px;font-size:.9rem;line-height:1}
+.info p{margin:10px 16px 0;font-size:.9rem;line-height:1.55;max-width:65ch}
+.ctls{margin:14px 16px 0}
+.ctls h3{margin:0 0 8px;font-family:var(--mono);font-size:.68rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px}
+.ctls h3 i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--hit)}
+.ctls ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ctls li{display:grid;gap:3px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.ctls .ref{font-family:var(--mono);font-size:.72rem;font-weight:500;color:var(--accent)}
+.ctls .txt{font-size:.84rem;line-height:1.45}
+.info-foot{padding:14px 16px 16px;display:flex;gap:8px;flex-wrap:wrap}
+.focus{position:absolute;left:16px;bottom:14px;width:300px;max-width:calc(100% - 32px);background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 24px rgb(0 0 0 / .12)}
+.focus summary{list-style:none;cursor:pointer;padding:10px 14px;font-family:var(--display);font-weight:700;font-size:.92rem;display:flex;justify-content:space-between;align-items:center}
+.focus summary::-webkit-details-marker{display:none}
+.focus summary::after{content:"+";font-family:var(--mono);color:var(--muted)}
+.focus[open] summary::after{content:"–"}
+.focus ol{margin:0;padding:0 14px 6px 32px;font-size:.84rem;line-height:1.5;display:grid;gap:4px}
+.focus .meta{border-top:1px solid var(--line);padding:9px 14px 11px;font-family:var(--mono);font-size:.7rem;color:var(--muted);display:grid;gap:3px}
+.focus .meta a{color:var(--accent)}
+@media (max-width:640px){
+  .search input{width:100%;max-width:none}
+  .search{flex:1 1 100%}
+  .tools{margin-left:0;width:100%}
+  .hint{display:none}
+  .info{left:0;right:0;top:auto;bottom:0;width:auto;max-width:none;max-height:58%;border-radius:12px 12px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>CISO MindMap 2026</h1>
+    <p>What do Security Professionals really do? · Rafeeq Rehman</p>
+  </div>
+  <div class="tools">
+    <label class="search" for="q">
+      <input id="q" type="search" placeholder="Search topics (e.g. ransomware)" autocomplete="off" aria-label="Search the map">
+      <span class="count" id="count"></span>
+    </label>
+    <button id="expand" type="button">Expand all</button>
+    <button id="collapse" type="button">Collapse</button>
+    <button id="fit" type="button">Fit to screen</button>
+  </div>
+</header>
+<main>
+  <svg id="map" role="img" aria-label="Interactive CISO MindMap 2026"></svg>
+  <div class="hint">Click a topic to read about it · drag to pan · scroll to zoom · <i></i> has controls</div>
+  <aside class="info" id="info" hidden aria-live="polite">
+    <div class="info-head">
+      <div class="crumb" id="crumb"></div>
+      <h2 id="infoTitle"></h2>
+      <button class="close" id="infoClose" type="button" aria-label="Close details">×</button>
+    </div>
+    <p id="infoDesc"></p>
+    <div class="ctls" id="ctls" hidden>
+      <h3><i></i>Key controls &amp; requirements</h3>
+      <ul id="ctlList"></ul>
+    </div>
+    <div class="info-foot" id="infoFoot"></div>
+  </aside>
+  <details class="focus" id="focus" open>
+    <summary>Focus Areas 2026-27</summary>
+    <ol>
+      <li>Embrace and Adapt to AI</li>
+      <li>Consolidate and rationalize security tools</li>
+      <li>Old threats have not disappeared</li>
+      <li>Take good care of your teams</li>
+    </ol>
+    <div class="meta">
+      <span>Last update: Apr 11, 2026 · Expires: Sep 30, 2027</span>
+      <span>@rafeeq_rehman · <a href="http://rafeeqrehman.com" target="_blank" rel="noopener">rafeeqrehman.com</a></span>
+      <span>© 2012–2026 Rafeeq Rehman</span>
+    </div>
+  </details>
+</main>
+
+<script>
+// d = short explanation; c = [reference, control / requirement]
+// Keys are node names; "Parent > Name" disambiguates names that appear more than once.
+const INFO = {
+"CISO MindMap 2026": {d: "Rafeeq Rehman's map of the responsibilities of a CISO and the security team, updated yearly since 2012. Select any topic to see what it covers and the key controls behind it."},
+
+// ───────── Security Operations
+"Security Operations": {d: "The day-to-day defensive engine of the security program: preventing attacks, detecting what gets through, and responding and recovering when incidents happen. Organized around the NIST CSF functions.",
+  c: [["NIST CSF 2.0", "Cover the Identify, Protect, Detect, Respond and Recover functions with owned, measured activities"]]},
+"Threat Prevention (NIST CSF Identify & Protect)": {d: "Knowing what you have and hardening it so attacks fail before they start: asset visibility, vulnerability management, secure configuration and protective technologies.",
+  c: [["NIST CSF 2.0 ID / PR", "Maintain asset inventories, assess risk and implement safeguards proportionate to it"]]},
+"Asset Management": {d: "A complete, current inventory of hardware, software, cloud resources and data, each with an owner. You cannot protect, patch or monitor what you do not know exists.",
+  c: [["CIS Controls v8 1–2", "Inventory enterprise and software assets; remove or quarantine unauthorized ones"], ["ISO/IEC 27001 A.5.9", "Inventory of information and other associated assets, including owners"], ["NIST CSF 2.0 ID.AM", "Assets are identified and managed consistent with their importance"]]},
+"Network/Application Firewalls": {d: "Devices and services that filter traffic between network zones and inspect application-layer traffic, enforcing which communications are allowed.",
+  c: [["ISO/IEC 27001 A.8.20–8.22", "Network security, security of network services and segregation of networks"], ["PCI DSS v4.0 Req. 1", "Install and maintain network security controls; review rulesets at least every six months"]]},
+"Vulnerability Management": {d: "The continuous cycle of finding, prioritizing, fixing and verifying security weaknesses across systems, applications and cloud.",
+  c: [["CIS Controls v8 7", "Documented vulnerability management process with risk-based remediation"], ["ISO/IEC 27001 A.8.8", "Management of technical vulnerabilities"], ["PCI DSS v4.0 11.3", "Internal and external vulnerability scans at least every three months"]]},
+"Scope": {d: "Defines which asset types the vulnerability program covers. Gaps in scope, such as containers, OT or SaaS, become blind spots attackers use.",
+  c: [["Requirement", "Document the scanning scope and review it whenever new technology is introduced"]]},
+"Operating Systems": {d: "Server and endpoint operating systems (Windows, Linux, macOS) scanned for missing patches and insecure settings."},
+"Network Devices": {d: "Routers, switches, firewalls, VPN gateways and load balancers. Internet-facing edge devices are among the most exploited targets.",
+  c: [["CISA KEV", "Prioritize edge devices with vulnerabilities in the Known Exploited Vulnerabilities catalog"]]},
+"Applications": {d: "Commercial and in-house applications, including the third-party libraries they depend on."},
+"Databases": {d: "Database engines and their configuration: default accounts, excessive privileges, missing patches and unencrypted sensitive data."},
+"Code Review": {d: "Examining source code, manually or with tools, to find vulnerabilities before release.",
+  c: [["ISO/IEC 27001 A.8.28", "Secure coding principles applied to software development"]]},
+"Scope > Physical Security": {d: "Weaknesses in physical security systems such as badge readers, cameras and building management systems, which are often networked and exposed."},
+"Cloud misconfiguration testing": {d: "Checking cloud accounts for risky settings such as public storage buckets, open security groups or overly broad IAM roles; a leading cause of cloud breaches.",
+  c: [["CIS Benchmarks", "Assess cloud accounts against the CIS Foundations Benchmarks for AWS, Azure and GCP"]]},
+"Mobile Devices & Apps": {d: "Phones, tablets and mobile applications: OS versions, jailbreak/root status and insecure app behavior.",
+  c: [["OWASP MASVS", "Mobile Application Security Verification Standard for in-house apps"]]},
+"Containers": {d: "Container images and runtimes. Scan images for vulnerable packages and embedded secrets before and after deployment.",
+  c: [["NIST SP 800-190", "Application Container Security Guide"]]},
+"Attack surface management": {d: "Continuous discovery of everything you expose to the internet, including forgotten domains, shadow IT and third-party hosted assets, seen from an attacker's point of view."},
+"IoT": {d: "Connected devices such as cameras, printers and sensors, which often run outdated firmware and cannot host security agents."},
+"OT/SCADA": {d: "Operational technology that controls physical processes. Scanning must be passive or carefully coordinated, because active scans can disrupt operations.",
+  c: [["IEC 62443", "Security for industrial automation and control systems"], ["NIST SP 800-82r3", "Guide to Operational Technology Security"]]},
+"Identify (periodic or continuous)": {d: "Discovering vulnerabilities through scheduled scans, agents and continuous monitoring. Continuous approaches shrink the window between disclosure and detection."},
+"Classify & prioritize": {d: "Ranking findings by real risk rather than raw count, because no team can fix everything at once."},
+"Risk Based Approach": {d: "Prioritizing by combining severity, exploitability, asset criticality and exposure, so the riskiest issues are fixed first."},
+"Prioritize (e.g. use of EPSS)": {d: "Using exploit intelligence, such as FIRST's Exploit Prediction Scoring System and CISA's KEV catalog, to focus on vulnerabilities likely to be exploited.",
+  c: [["CISA BOD 22-01", "US federal agencies must fix KEV-listed vulnerabilities by set deadlines; a useful benchmark for any organization"]]},
+"Mitigation (Fix, verify, false positive)": {d: "Patching or applying compensating controls, rescanning to verify the fix, and formally documenting false positives and accepted risks.",
+  c: [["Requirement", "Define remediation SLAs by severity and track exceptions with an owner and expiry date"]]},
+"Measure": {d: "Tracking vulnerability program performance over time to show progress and find bottlenecks."},
+"Baseline": {d: "The starting point (current vulnerability counts, coverage and fix times) against which improvement is measured."},
+"Metrics": {d: "Indicators such as mean time to remediate, SLA compliance, scan coverage and vulnerability age, reported to management."},
+"Web Application Security": {d: "Protecting web applications and APIs throughout their life, from secure design and coding to testing and runtime protection.",
+  c: [["OWASP ASVS", "Application Security Verification Standard as the requirements baseline"], ["PCI DSS v4.0 6.4", "Public-facing web applications are protected against attacks"]]},
+"Application Development Standards": {d: "Documented secure coding rules and approved frameworks that developers follow, e.g. input validation, output encoding and secret handling.",
+  c: [["NIST SP 800-218 (SSDF)", "Secure Software Development Framework practices"], ["ISO/IEC 27001 A.8.25", "Secure development life cycle"]]},
+"Secure Code Training and Review": {d: "Teaching developers common flaws and reviewing code for security issues before it is merged.",
+  c: [["PCI DSS v4.0 6.2.2", "Developers trained in secure coding at least once every 12 months"]]},
+"Application Vulnerability Testing": {d: "Testing applications with SAST, DAST, IAST and manual penetration testing to find exploitable flaws.",
+  c: [["ISO/IEC 27001 A.8.29", "Security testing in development and acceptance"]]},
+"Change Control, File Integrity Monitoring": {d: "Making sure application changes are authorized and tested, and detecting unauthorized changes to critical files.",
+  c: [["ISO/IEC 27001 A.8.32", "Change management"], ["PCI DSS v4.0 11.5.2", "Change-detection mechanism alerts on unauthorized modification of critical files"]]},
+"Web Application Firewall": {d: "A filter in front of web applications that blocks common attacks such as SQL injection and XSS, and can provide virtual patching while a fix is developed."},
+"Integration to SDLC and Project Delivery": {d: "Embedding security checkpoints into development and project methodologies so security is built in rather than added at the end."},
+"Inventory open source components": {d: "Keeping a software bill of materials (SBOM) of open-source libraries so you can react quickly when one is found vulnerable, as with Log4Shell.",
+  c: [["NTIA SBOM minimum elements", "Produce and maintain SBOMs for developed and acquired software"]]},
+"Source code supply chain security": {d: "Protecting repositories, build pipelines and dependencies from tampering: protected branches, signed commits and verifiable build provenance.",
+  c: [["SLSA", "Supply-chain Levels for Software Artifacts framework for build integrity"]]},
+"API Security": {d: "Securing APIs through authentication, object-level authorization, rate limiting, schema validation and a maintained API inventory.",
+  c: [["OWASP API Security Top 10 (2023)", "Address broken object-level authorization and the other top API risks"]]},
+"Network IPS and IDS": {d: "Intrusion detection and prevention systems that inspect network traffic for known attack patterns and anomalies, alerting on or blocking them.",
+  c: [["NIST SP 800-94", "Guide to Intrusion Detection and Prevention Systems"], ["CIS Controls v8 13", "Network monitoring and defense"]]},
+"Identity Management": {d: "Controlling who has accounts and what they can reach. Identity is now the main security perimeter; see the Identity and Access Management branch for detail."},
+"Threat Prevention (NIST CSF Identify & Protect) > DLP": {d: "Data loss prevention tools that block sensitive data from leaving through email, web, USB or cloud apps, based on content inspection and policy.",
+  c: [["ISO/IEC 27001 A.8.12", "Data leakage prevention"]]},
+"Anti Malware, Anti-spam": {d: "Endpoint protection (EDR) and email filtering that stop malicious files, links and phishing before users act on them.",
+  c: [["CIS Controls v8 9–10", "Email and web browser protections; malware defenses"], ["ISO/IEC 27001 A.8.7", "Protection against malware"]]},
+"Proxy/Content Filtering": {d: "Controlling and inspecting web traffic to block malicious or inappropriate sites and downloads.",
+  c: [["ISO/IEC 27001 A.8.23", "Web filtering"]]},
+"DNS security/filtering": {d: "Blocking the resolution of malicious domains and protecting DNS infrastructure; a cheap, effective control against malware and phishing.",
+  c: [["CIS Controls v8 9.2", "Use DNS filtering services"]]},
+"Patching": {d: "Applying vendor security updates on a defined schedule, with an emergency process for actively exploited flaws.",
+  c: [["NIST SP 800-40r4", "Guide to Enterprise Patch Management Planning"], ["PCI DSS v4.0 6.3.3", "Critical security patches installed within one month of release"]]},
+"DDoS Protection": {d: "Services that absorb or filter floods of traffic designed to make websites and online services unavailable."},
+"Hardening guidelines": {d: "Secure configuration baselines that remove unnecessary services, default accounts and risky settings.",
+  c: [["CIS Controls v8 4", "Secure configuration of enterprise assets and software"], ["ISO/IEC 27001 A.8.9", "Configuration management"]]},
+"Desktop and mobile security": {d: "Protecting user devices with EDR, disk encryption, patching, application control and device management.",
+  c: [["ISO/IEC 27001 A.8.1", "User endpoint devices"]]},
+"Encryption, SSL, PKI, Quantum Safe Encryption": {d: "Protecting data in transit and at rest, managing certificates and keys, and planning the move to post-quantum algorithms before quantum computers can break today's public-key cryptography.",
+  c: [["ISO/IEC 27001 A.8.24", "Use of cryptography, including key management"], ["NIST FIPS 203/204/205", "Post-quantum cryptography standards (ML-KEM, ML-DSA, SLH-DSA)"]]},
+"Security Health Checks": {d: "Periodic reviews of security configurations and controls to catch drift and confirm protections still work as intended."},
+"Public software repositories, Supply chain": {d: "Risks from packages pulled from npm, PyPI and similar registries, including typosquatting and malicious or hijacked packages.",
+  c: [["Requirement", "Pull packages through an internal proxy or allow-list and scan dependencies before use"]]},
+"Awareness training": {d: "Teaching staff to recognize phishing, social engineering and unsafe behavior, reinforced with simulations.",
+  c: [["CIS Controls v8 14", "Security awareness and skills training"], ["ISO/IEC 27001 A.6.3", "Information security awareness, education and training"]]},
+
+"Threat Detection (NIST CSF Detect)": {d: "Finding attacks in progress by collecting telemetry, correlating events and hunting for adversaries who got past preventive controls.",
+  c: [["NIST CSF 2.0 DE.CM / DE.AE", "Continuous monitoring and adverse event analysis"]]},
+"Log Analysis/correlation/SIEM, SOAR, AI Agents": {d: "Centralizing logs in a SIEM, correlating them into alerts, and automating triage with SOAR playbooks and AI agents.",
+  c: [["CIS Controls v8 8", "Audit log management, including central collection and retention"], ["ISO/IEC 27001 A.8.15–8.16", "Logging and monitoring activities"], ["PCI DSS v4.0 10.5.1", "Retain audit logs at least 12 months, three months immediately available"]]},
+"Alerting (IDS/IPS, FIM, WAF, Anti Malware, etc)": {d: "Tuning detection tools so alerts are meaningful and reach the right responders, avoiding alert fatigue."},
+"NetFlow analysis": {d: "Analyzing network flow metadata (who talked to whom, how much and when) to spot lateral movement, beaconing and data exfiltration."},
+"Threat Detection (NIST CSF Detect) > DLP": {d: "Using DLP events as a detection source for insider threats and exfiltration attempts, not only as a blocking control."},
+"Threat hunting and insider threat": {d: "Proactively searching for hidden adversaries using hypotheses and threat intelligence, and monitoring for malicious or negligent insiders.",
+  c: [["MITRE ATT&CK", "Base hunting hypotheses on documented adversary techniques"]]},
+"MSSP integration": {d: "Working with managed security service providers (e.g. MDR) so their monitoring and escalation fit your internal processes.",
+  c: [["Requirement", "Define SLAs, escalation paths, log ownership and data return in the contract"]]},
+"Threat Detection capability assessment": {d: "Evaluating how well current tools and processes detect the attack techniques that matter to you."},
+"Gap assessment": {d: "Mapping existing detections against a framework such as MITRE ATT&CK to find techniques you cannot see."},
+"Prioritization to fill gaps": {d: "Deciding which detection gaps to close first, based on the threats most relevant to your industry and environment."},
+"SOC Operations": {d: "Running the Security Operations Center: the people, processes and technology that monitor and respond, often around the clock."},
+"SOC Resource Mgmt": {d: "Staffing levels, skills mix and budget for the SOC, balanced against alert volume and coverage hours."},
+"SOC Staff continuous training": {d: "Ongoing hands-on training, labs and certifications so analysts keep pace with attacker techniques."},
+"Shift management": {d: "Organizing 24x7 coverage, handovers and rotations sustainably to avoid gaps and burnout."},
+"SOC procedures": {d: "Documented runbooks for triage, escalation and investigation so response is consistent regardless of who is on shift.",
+  c: [["ISO/IEC 27001 A.5.37", "Documented operating procedures"]]},
+"SOC Metrics and Reports": {d: "Measures such as mean time to detect and respond, alert volume, false-positive rate and detection coverage, reported to leadership."},
+"SOC and NOC Integration": {d: "Coordinating the security and network operations centers to share visibility and resolve incidents faster."},
+"SOC Tech stack management": {d: "Managing the SOC's tools (SIEM, EDR, SOAR, TIP), including licensing, integration, tuning and consolidation."},
+"SOC DR exercise": {d: "Testing that the SOC itself can keep operating if its site, tools or SIEM become unavailable."},
+"Partnerships with ISACs": {d: "Joining Information Sharing and Analysis Centers to exchange threat intelligence with peers in your sector.",
+  c: [["ISO/IEC 27001 A.5.6", "Contact with special interest groups"]]},
+"Long term trend analysis": {d: "Looking across months of data for slow attacks and recurring weaknesses that daily triage misses."},
+"Unstructured data from IoT": {d: "Ingesting and making sense of non-standard telemetry from IoT and OT devices."},
+"Integrate new data sources (see areas under skills development)": {d: "Onboarding telemetry from new technologies, such as cloud, OT and AI systems, into security monitoring."},
+"Skills Development": {d: "Building analyst knowledge in emerging technology areas the SOC will increasingly need to monitor.",
+  c: [["NIST SP 800-181 (NICE)", "Workforce Framework for Cybersecurity roles, tasks and skills"]]},
+"AI, Machine Learning Skill Development": {d: "Training analysts to use AI tools and to investigate AI and ML systems, including how models fail and are attacked."},
+"Understand Algorithm Biases": {d: "Recognizing that ML-based detections can be skewed by their training data, creating blind spots or unfair outcomes."},
+"Skills Development > IOT": {d: "Understanding IoT protocols, device behavior and typical attacks so analysts can investigate IoT alerts."},
+"Autonomous Vehicles": {d: "Knowledge of vehicle systems, sensors and connectivity, relevant for fleets and transportation organizations."},
+"Drones": {d: "Understanding drone threats such as surveillance and payload delivery, drone detection, and securing company-operated drones."},
+"Medical Devices": {d: "Knowledge of connected medical device risks and regulations, essential in healthcare environments."},
+"Industrial Control Systems (ICS)": {d: "Understanding PLCs, SCADA and industrial protocols to detect attacks on physical processes.",
+  c: [["MITRE ATT&CK for ICS", "Adversary techniques specific to industrial control systems"]]},
+"MITRE ATT&CK": {d: "The public knowledge base of adversary tactics and techniques, used as a common language for detection engineering, hunting and reporting."},
+"Soft skills": {d: "Communication, writing and stakeholder skills so analysts can explain incidents clearly under pressure."},
+"DevOps Integration": {d: "Applying version control, testing and CI/CD practices to detection rules (detection-as-code)."},
+"Prepare for unplanned work": {d: "Keeping capacity in reserve for major incidents and zero-days that disrupt planned work."},
+"Manage data process cost": {d: "Controlling SIEM ingestion and storage costs through filtering, tiering and data pipelines without losing critical visibility."},
+"Use of AI, GenAI and Data Analytics": {d: "Applying machine learning and generative AI to improve detection, investigation and reporting."},
+"Use of computer vision in physical security": {d: "Using AI video analytics to detect tailgating, intrusions or unusual behavior in camera feeds."},
+"Log Anomaly Detection": {d: "Using ML to find unusual patterns in logs that signature rules miss, such as abnormal logins or data volumes."},
+"ML model training, retraining": {d: "Keeping detection models accurate by retraining them as the environment and attacker behavior change."},
+"Red team/blue team exercises": {d: "Simulated attacks (red) against defenders (blue), often run together as purple teaming, to test and improve detection and response.",
+  c: [["CIS Controls v8 18", "Penetration testing"]]},
+"Integrate threat intelligence platform (TIP)": {d: "Centralizing threat intelligence feeds and indicators and pushing them into detection and blocking tools.",
+  c: [["ISO/IEC 27001 A.5.7", "Threat intelligence"]]},
+"Deception technologies for breach detection": {d: "Decoys such as honeypots, honeytokens and fake credentials that raise high-confidence alerts when an attacker touches them.",
+  c: [["MITRE Engage", "Framework for adversary engagement and deception"]]},
+"Full packet inspection": {d: "Capturing and analyzing complete network packets for deep investigation, within privacy and storage limits."},
+"Detect misconfigurations": {d: "Continuously checking for risky configuration changes in cloud, SaaS and identity systems, e.g. with CSPM and SSPM tools."},
+"Integrate Cloud based tools": {d: "Bringing cloud-native security telemetry (e.g. AWS CloudTrail, Microsoft Defender, Google Security Command Center) into central monitoring."},
+
+"Incident Management (NIST CSF Respond & Recover)": {d: "Preparing for, handling and recovering from security incidents to limit damage and restore operations.",
+  c: [["NIST SP 800-61r3", "Incident response recommendations aligned to CSF 2.0"], ["ISO/IEC 27001 A.5.24–5.28", "Incident planning, assessment, response, learning and evidence collection"]]},
+"Create adequate Incident Response capability": {d: "Establishing an incident response team, roles, tools, authority and external support that match the organization's risk.",
+  c: [["CIS Controls v8 17", "Incident response management"]]},
+"Incident Response Playbooks": {d: "Step-by-step procedures for common incident types, such as ransomware, business email compromise, data leaks and account takeover."},
+"Incident Readiness Assessment": {d: "An independent review of whether people, processes and tools are ready to handle a serious incident."},
+"Forensic Investigation": {d: "Collecting and analyzing evidence to determine what happened, how, and what was affected, while preserving chain of custody.",
+  c: [["ISO/IEC 27001 A.5.28", "Collection of evidence"]]},
+"Data Breach Preparation": {d: "Getting ready for incidents involving personal or sensitive data, which carry legal notification duties and reputational impact.",
+  c: [["GDPR Art. 33", "Notify the supervisory authority within 72 hours of becoming aware of a personal data breach"]]},
+"Update and Test Incident Response Plan": {d: "Keeping the incident response plan current with contacts, systems and regulations, and testing it regularly.",
+  c: [["PCI DSS v4.0 12.10.2", "Review and test the incident response plan at least once every 12 months"]]},
+"Set Leadership Expectations": {d: "Agreeing in advance with executives on their role, decision rights and communication during a breach."},
+"Forensic and IR Partner, retainer": {d: "Having an external incident response firm on retainer so expert help arrives in hours, not days. Often required or arranged by cyber insurers."},
+"Adequate Logging": {d: "Making sure the logs needed for investigation exist, are kept long enough and are protected from tampering.",
+  c: [["ISO/IEC 27001 A.8.15", "Logging"]]},
+"Breach exercises (e.g. simulations)": {d: "Tabletop and technical exercises that rehearse breach scenarios with IT, legal, communications and executives."},
+"First responders Training": {d: "Training IT and helpdesk staff on what to do, and not do, in the first minutes of an incident so evidence is preserved."},
+"IR Playbook testing": {d: "Walking through playbooks to confirm they work and that tools, access and contact details are still valid."},
+"Media Relations": {d: "Prepared statements, trained spokespeople and approval processes for communicating with the press during an incident."},
+"Business Continuity Planning": {d: "Plans to keep critical business functions running during and after a disruptive incident.",
+  c: [["ISO 22301", "Business continuity management systems"], ["ISO/IEC 27001 A.5.29–5.30", "Information security during disruption; ICT readiness for business continuity"]]},
+"Ransomware": {d: "Specific preparation for attacks that encrypt or steal data for extortion, still one of the most damaging threats.",
+  c: [["NIST IR 8374", "Ransomware Risk Management: a Cybersecurity Framework Profile"], ["CISA #StopRansomware Guide", "Prevention and response checklist"]]},
+"Identify critical systems": {d: "Knowing which systems and data the business cannot operate without, to prioritize protection and recovery."},
+"Perform ransomware BIA": {d: "A business impact analysis estimating the operational and financial impact if key systems were encrypted for days or weeks."},
+"Tie with BC/DR Plans": {d: "Aligning ransomware response with business continuity and disaster recovery plans, recovery priorities and recovery time objectives."},
+"Devise containment strategy": {d: "Planning in advance how to isolate infected systems, network segments or sites quickly without shutting down more than necessary."},
+"Ensure adequate backups": {d: "Backing up critical systems and data often enough to meet recovery point objectives.",
+  c: [["CIS Controls v8 11", "Data recovery"], ["ISO/IEC 27001 A.8.13", "Information backup"]]},
+"Periodic backup test": {d: "Regularly restoring from backup to prove recovery works and meets time objectives."},
+"Offline backups in case backup is ransomed": {d: "Keeping immutable, offline or logically isolated backup copies that attackers cannot encrypt or delete.",
+  c: [["Requirement", "Follow a 3-2-1 approach with at least one immutable or offline copy and separate backup credentials"]]},
+"Mock exercises": {d: "Ransomware tabletop exercises, including the decision on whether to pay and when to engage law enforcement."},
+"Implement machine integrity checking": {d: "Verifying that systems and files have not been tampered with, to detect ransomware staging early and to trust restored systems."},
+"Automation and SOAR": {d: "Using security orchestration, automation and response to speed up repetitive investigation and containment steps."},
+"Playbooks": {d: "Automated SOAR workflows that enrich alerts and take actions such as isolating a host or disabling an account."},
+"Supply chain incident mgmt": {d: "Responding when a vendor, software component or service provider you depend on is compromised.",
+  c: [["NIST SP 800-161r1", "Cybersecurity Supply Chain Risk Management Practices"]]},
+"Keep inventory of software components": {d: "Knowing which products and libraries you use (for example through SBOMs) so you can quickly assess exposure when a supplier is breached."},
+"Integrate into vulnerability mgmt": {d: "Feeding supplier advisories and SBOM data into vulnerability management workflows."},
+"Integrate into SDLC and risk mgmt process": {d: "Considering supply chain risk when choosing components and vendors, not only after an incident."},
+"AI Models, Agents, Tools": {d: "Extending supply chain inventory and response to third-party AI models, agents and tool integrations."},
+"Managing relationships with law enforcement": {d: "Establishing contacts with agencies such as the FBI or national CERTs before an incident, and knowing when to involve them.",
+  c: [["ISO/IEC 27001 A.5.5", "Contact with authorities"]]},
+"Post-incident analysis & future avoidance of similar incidents": {d: "Blameless lessons-learned reviews that identify root causes and track improvement actions to closure.",
+  c: [["ISO/IEC 27001 A.5.27", "Learning from information security incidents"]]},
+"Cyber Risk Insurance": {d: "Transferring part of the financial impact of incidents to insurers. Policies increasingly require controls such as MFA, EDR and tested backups."},
+
+// ───────── Using and Securing AI
+"Using and Securing AI": {d: "Two sides of AI for security leaders: governing and protecting the organization's own use of AI, and using AI to make the security team more effective. The top focus area for 2026-27.",
+  c: [["NIST AI RMF 1.0", "AI Risk Management Framework: Govern, Map, Measure, Manage"], ["ISO/IEC 42001", "AI management system standard"]]},
+"Securing AI": {d: "Managing the new risks introduced by AI models, chatbots and agents, from data leakage to prompt injection."},
+"AI Policies, Governance and Transparency": {d: "Rules on approved AI use, accountability, data handling and telling people when AI is involved.",
+  c: [["EU AI Act", "Risk-based obligations for providers and deployers of AI systems in the EU"]]},
+"AI Frameworks (Google, NIST, Databricks, IBM, etc.)": {d: "Published frameworks such as Google SAIF, NIST AI RMF and the Databricks AI Security Framework that structure AI risk controls."},
+"Ethical and Responsible use of AI": {d: "Making sure AI is fair, explainable, privacy-respecting and used in line with company values."},
+"LLMs, Chatbots, Agents, RAG": {d: "The main generative AI patterns and their distinct risks, e.g. agents that take actions and RAG systems that can expose internal data."},
+"Protecting Intellectual Property": {d: "Preventing confidential data and code from leaking into external AI tools, and managing rights over AI-generated output.",
+  c: [["ISO/IEC 27001 A.5.32", "Intellectual property rights"]]},
+"Agentic AI frameworks": {d: "Frameworks for building autonomous agents. Securing them means limiting each agent's permissions, tools and actions."},
+"New vulnerabilities and risks introduced by AI, Adversarial attacks": {d: "Attack classes specific to AI, such as prompt injection, data poisoning, model extraction and evasion.",
+  c: [["MITRE ATLAS", "Knowledge base of adversary tactics and techniques against AI systems"]]},
+"OWASP Top 10 for LLMs": {d: "OWASP's list of the most critical risks for LLM applications, including prompt injection, sensitive information disclosure and excessive agency.",
+  c: [["OWASP Top 10 for LLM Applications (2025)", "Baseline risk checklist for LLM applications"]]},
+"AI Model Red Teaming": {d: "Adversarially testing models and AI applications to find jailbreaks, harmful outputs and data leaks before attackers do."},
+"MCP, A2A and other AI protocols": {d: "Protocols that connect AI agents to tools (Model Context Protocol) and to other agents (Agent2Agent). They need authentication, authorization and vetting of the servers they connect to.",
+  c: [["Requirement", "Allow-list approved MCP servers and give agents least-privilege tool access"]]},
+"AI Models and Supply Chain Risks": {d: "Risks from third-party models, datasets and model hubs, including backdoored or tampered models."},
+"Agentic AI and Tools": {d: "Securing agents that act on behalf of users, such as sending email or changing systems, with guardrails and approval steps."},
+"AI Application security testing": {d: "Testing AI-powered applications for both traditional flaws and AI-specific issues such as prompt injection."},
+"AI Sovereignty, data lakes": {d: "Controlling where AI data and models reside and who can reach them, including data residency obligations."},
+"Human in the loop strategies": {d: "Deciding which AI decisions or actions require human review or approval, especially high-impact ones."},
+"Security of RAG/Vector databases": {d: "Protecting retrieval systems so the AI only retrieves data the requesting user is allowed to see."},
+"Third party AI tools": {d: "Assessing and governing the SaaS AI tools employees use, including unapproved shadow AI.",
+  c: [["ISO/IEC 27001 A.5.19", "Information security in supplier relationships"]]},
+"Using AI": {d: "Applying AI to make security work faster and more effective."},
+"Train InfoSec teams on AI technologies": {d: "Upskilling security staff to use AI tools and to understand the AI systems they must defend."},
+"Automated pen testing": {d: "AI-assisted tools that continuously probe the environment for exploitable paths, complementing human testers."},
+"AI threat hunting": {d: "Using AI to sift large data sets, suggest hunting hypotheses and surface suspicious patterns."},
+"SOC AI agents": {d: "AI agents that triage alerts, gather context and draft investigation summaries for analysts."},
+"Source code scanning": {d: "AI-assisted code review that finds vulnerabilities and proposes fixes."},
+"Automating routine tasks": {d: "Using AI for repetitive work such as security questionnaires, report drafting and ticket enrichment."},
+"Staff training and research": {d: "Using AI as a learning and research assistant for security staff."},
+"AI for threat modeling": {d: "Using AI to help generate and review threat models from architecture descriptions."},
+"AI gateways": {d: "Proxies between users or applications and AI models that enforce policy, redact sensitive data, log usage and block risky prompts."},
+
+// ───────── Governance
+"Governance": {d: "How security is directed and overseen: strategy, policies, frameworks, roles, metrics and board oversight.",
+  c: [["NIST CSF 2.0 GV", "Govern function: context, risk strategy, roles, policy, oversight and supply chain"], ["ISO/IEC 27001 Cl. 5", "Leadership commitment, policy and organizational roles"]]},
+"Strategy and business alignment": {d: "Making sure security priorities support business goals and the organization's risk appetite."},
+"Security policies, standards": {d: "The documented rules (policies) and specific technical requirements (standards) that define expected security behavior.",
+  c: [["ISO/IEC 27001 A.5.1", "Policies for information security, approved by management and reviewed at planned intervals"]]},
+"Legal, regulatory and contract": {d: "Identifying the laws, regulations and contractual obligations that apply and turning them into security requirements.",
+  c: [["ISO/IEC 27001 A.5.31", "Legal, statutory, regulatory and contractual requirements"]]},
+"Risk Mgmt/Control Frameworks (a typical organization will choose a subset of these)": {d: "Reference frameworks that provide control catalogs and structure. Most organizations adopt one primary framework and map the others to it."},
+"NIST - relevant NIST standards": {d: "NIST publications such as CSF 2.0, the SP 800-53 control catalog and the SP 800-37 Risk Management Framework."},
+"ISO": {d: "ISO/IEC 27001 (certifiable management system) and 27002 (control guidance), plus related standards such as 27701 for privacy."},
+"COSO": {d: "Internal control and enterprise risk management framework widely used for financial reporting and SOX."},
+"COBIT": {d: "ISACA's framework for the governance and management of enterprise IT."},
+"ITIL": {d: "IT service management practices (change, incident and problem management) that security processes rely on."},
+"FAIR": {d: "Factor Analysis of Information Risk: a model for quantifying cyber risk in financial terms."},
+"FISMA": {d: "US federal law requiring agencies and their contractors to run information security programs based on NIST standards."},
+"CMMC": {d: "Cybersecurity Maturity Model Certification, required for US Department of Defense contractors that handle controlled information."},
+"Visibility across multiple frameworks": {d: "Mapping controls once to satisfy several frameworks (a common control framework) to avoid duplicated audits and effort."},
+"Roles and Responsibilities (RACI charts)": {d: "Clearly defining who is Responsible, Accountable, Consulted and Informed for each security activity.",
+  c: [["ISO/IEC 27001 A.5.2", "Information security roles and responsibilities"]]},
+"Data Ownership, sharing, and data privacy": {d: "Assigning business owners to data sets and governing how data is shared and used in line with privacy law.",
+  c: [["ISO/IEC 27001 A.5.34", "Privacy and protection of personal data"]]},
+"Conflict Management": {d: "Resolving tensions between security and other goals (speed, cost, usability) through defined escalation and formal risk acceptance."},
+"Metrics and Reporting": {d: "Measuring security performance and risk and communicating it to different audiences.",
+  c: [["NIST SP 800-55", "Measurement guide for information security"]]},
+"Operational Metrics": {d: "Technical measures for security teams, such as patch rates, detection times and control coverage."},
+"Executive Metrics": {d: "Business-level indicators of risk and trend for executives and the board, tied to business impact."},
+"Validating effectiveness of metrics": {d: "Checking that metrics drive decisions and reflect real risk, rather than just counting activity."},
+"IT, OT, IoT/IIoT Convergence": {d: "Governing security consistently as IT, operational technology and industrial IoT networks become connected."},
+"Explore options for cooperative SOC, collaborative infosec": {d: "Sharing SOC capabilities or intelligence with peers, subsidiaries or sector groups to gain scale."},
+"Tools and vendors consolidation": {d: "Reducing overlapping security tools and vendors to cut cost and complexity. One of the 2026-27 focus areas."},
+"Evaluating control effectiveness": {d: "Testing whether controls work as designed and in operation, not just whether they exist.",
+  c: [["ISO/IEC 27001 Cl. 9", "Performance evaluation: monitoring, internal audit and management review"]]},
+"Maintaining a roadmap/plan for 1-3 years": {d: "A multi-year security plan linking initiatives, budget and expected risk reduction."},
+"Board oversight and board presentations": {d: "Keeping the board informed about cyber risk and securing its oversight, which regulators now expect.",
+  c: [["SEC Reg. S-K Item 106", "Public companies describe cyber risk management and board oversight in the annual 10-K"], ["NIS2 Art. 20", "Management bodies approve and oversee cybersecurity risk measures"]]},
+
+// ───────── Identity and Access Management
+"Identity and Access Management": {d: "Making sure the right people and machines have the right access to the right resources, and nothing more.",
+  c: [["NIST CSF 2.0 PR.AA", "Identity management, authentication and access control"], ["CIS Controls v8 5–6", "Account management; access control management"]]},
+"Identity Credentialing": {d: "Verifying a person's identity and then issuing credentials such as badges, certificates or passkeys.",
+  c: [["NIST SP 800-63", "Digital Identity Guidelines: identity proofing, authentication and federation"]]},
+"User Provisioning and Identity Life Cycle Management": {d: "Creating, changing and removing access as people join, move and leave (joiner-mover-leaver).",
+  c: [["ISO/IEC 27001 A.5.18", "Access rights: provisioning, periodic review and removal"]]},
+"Single Sign On (SSO, Simplified sign on)": {d: "One authentication gives access to many applications, improving the user experience and centralizing control."},
+"Repository (LDAP/Active Directory, Cloud Identity, Local ID stores)": {d: "The directories that store identities. Active Directory remains a prime attack target and must be hardened and monitored."},
+"Federation, SAML, Shibboleth": {d: "Trusting identities across organizations or domains using standards such as SAML."},
+"2-Factor (multi-factor) Authentication - MFA": {d: "Requiring a second factor beyond the password; one of the most effective controls against account takeover.",
+  c: [["CIS Controls v8 6.3–6.5", "MFA for externally exposed applications, remote access and administrative access"], ["PCI DSS v4.0 8.4.2", "MFA for all access into the cardholder data environment"]]},
+"Authenticator Apps": {d: "Mobile apps that generate codes or push approvals. Use number matching to resist MFA fatigue attacks."},
+"Tokens and cards": {d: "Hardware tokens and smart cards, including FIDO2 security keys, which are phishing-resistant."},
+"One time passcodes": {d: "Codes sent by SMS or email. Better than a password alone, but vulnerable to SIM swapping and real-time phishing."},
+"Role-Based Access Control (RBAC)": {d: "Granting access by job role rather than by individual, to enforce least privilege consistently.",
+  c: [["ISO/IEC 27001 A.5.15", "Access control rules based on business and security requirements"]]},
+"Customer Identity - Ecommerce and Mobile Apps": {d: "Customer identity and access management (CIAM), balancing security, privacy and a smooth customer experience."},
+"Password resets/self-service": {d: "Self-service reset flows that reduce helpdesk load; they must resist social engineering of the helpdesk."},
+"HR Process Integration": {d: "Driving account creation and removal from HR system events so leavers lose access promptly."},
+"Integrating cloud-based identities": {d: "Unifying identities across on-premises directories and cloud providers under consistent policies."},
+"IoT device identities": {d: "Unique, manageable identities (for example certificates) for devices so they can be authenticated and revoked."},
+"IAM SaaS solutions": {d: "Cloud identity platforms (IDaaS) that provide SSO, MFA and lifecycle management as a service."},
+"Unified identity profiles": {d: "A consolidated view of each identity with all its accounts and entitlements across systems."},
+"Password-less authentication": {d: "Replacing passwords with passkeys, biometrics or security keys, removing the credential attackers phish most."},
+"Voice signatures": {d: "Voice biometrics for authentication, increasingly undermined by AI voice cloning."},
+"Face recognition": {d: "Facial biometrics, usually on-device. Requires liveness detection to resist spoofing and deepfakes."},
+"Passkey": {d: "FIDO2/WebAuthn credentials bound to a device or synced account; a phishing-resistant replacement for passwords."},
+"IAM with Zero Trust technologies": {d: "Evaluating identity, device and context for every access request instead of trusting the network location.",
+  c: [["NIST SP 800-207", "Zero Trust Architecture"]]},
+"Privileged Access Management (PAM)": {d: "Vaulting, controlling and recording administrator accounts and credentials, ideally with just-in-time access.",
+  c: [["ISO/IEC 27001 A.8.2", "Privileged access rights"]]},
+"Use of public identity (Google, FB etc.)": {d: "Letting users sign in with existing social or public identity accounts."},
+"OAuth": {d: "Authorization standard that lets apps access resources on a user's behalf without sharing passwords. Watch for over-permissioned app consents."},
+"OpenID": {d: "OpenID Connect: an identity layer on top of OAuth 2.0, used for sign-in."},
+"Digital Certificates": {d: "X.509 certificates for authentication and encryption. They need automated lifecycle management as validity periods shrink.",
+  c: [["CA/Browser Forum SC-081", "Public TLS certificate lifetimes drop in stages to 47 days by 2029; automate renewal"]]},
+"API authentication and secrets management": {d: "Securing API keys, tokens and service credentials in vaults, rotating them and keeping them out of code.",
+  c: [["Requirement", "No secrets in source code; scan repositories and rotate exposed secrets immediately"]]},
+"AI Agent Identity": {d: "Giving AI agents their own auditable identities with scoped, time-bound permissions instead of borrowing human credentials."},
+
+// ───────── Team Management
+"Team Management": {d: "Leading the security function: its budget, its reputation within the company, and building and keeping the team."},
+"Manage Infosec Budget": {d: "Planning, defending and showing value for security spending."},
+"Managing Security Projects": {d: "Running security initiatives on time and budget, with clear scope and owners."},
+"Business Case Development": {d: "Justifying investments in terms of risk reduction, compliance and business value."},
+"Alignment with IT Projects": {d: "Coordinating with IT roadmaps to share costs and embed security in IT initiatives."},
+"Balancing budget for People, Training, and Tools/Technology/Hardware, travel, conferences": {d: "Splitting spend between staff, skills and technology. Buying tools without people to run them is a common trap."},
+"Consulting and outsourcing": {d: "Deciding which capabilities to buy as services (MDR, penetration testing, virtual CISO) and which to build in-house."},
+"CapEx and OpEx considerations": {d: "Understanding capital versus operating expense treatment, especially as security moves to subscriptions."},
+"Technology amortization": {d: "Spreading technology costs over their useful life and planning refresh cycles."},
+"Retire redundant & under utilized tools": {d: "Removing tools that overlap or are barely used, freeing budget and reducing complexity."},
+"Security Team Branding": {d: "Building the security team's reputation as a trusted business partner rather than a blocker."},
+"Aligning with Corporate Objectives": {d: "Framing security work around the business goals executives care about."},
+"Continuous Mgmt Updates, metrics": {d: "Regular, concise updates to management on progress and risk."},
+"Negotiation, give and take": {d: "Finding workable compromises with business units instead of taking absolute positions."},
+"Corporate politics, picking battles carefully": {d: "Spending political capital on the risks that matter most."},
+"Innovation and Value Creation": {d: "Showing that security can enable new products and markets, not only prevent losses."},
+"Expectations Management": {d: "Being clear about what security can and cannot guarantee, and on what timeline."},
+"Show progress/risk reduction": {d: "Demonstrating measurable reduction in risk over time."},
+"Return on Security Investment (ROSI)": {d: "Estimating the value of security investments relative to the losses they help avoid."},
+"Staffing and Talent Management": {d: "Hiring, developing and retaining security talent in a tight market. One of the 2026-27 focus areas."},
+"Recruiting, performance and retention": {d: "Attracting skilled people, managing performance and keeping staff through clear growth paths.",
+  c: [["ISO/IEC 27001 A.6.1", "Screening of candidates before joining"]]},
+"Staff burnout prevention": {d: "Managing workload, on-call duty and incident stress to keep the team healthy."},
+"Balance FTE and contractors": {d: "Mixing employees and contractors for flexibility while keeping critical knowledge in-house."},
+"Staff training and skills update": {d: "Continuous learning budget and time so skills keep pace with technology."},
+
+// ───────── Business Enablement
+"Business Enablement": {d: "Helping the business adopt new technologies, enter new markets and close deals safely and quickly."},
+"Mergers and Acquisitions": {d: "Assessing and integrating the security of acquired or merged companies."},
+"Acquisition Risk Assessment": {d: "Due diligence on a target's security posture, past breaches and liabilities before the deal closes."},
+"Network/Application/Cloud Integration Cost": {d: "Estimating the cost and effort to bring an acquired environment up to your standards."},
+"IAM integration": {d: "Merging identity systems and access so acquired staff can work without creating security gaps."},
+"Security tools rationalization": {d: "Choosing which of both companies' security tools to keep after integration."},
+"Cloud Computing": {d: "Securing the organization's use of IaaS, PaaS and SaaS across one or more providers.",
+  c: [["ISO/IEC 27001 A.5.23", "Information security for use of cloud services"], ["CSA CCM", "Cloud Controls Matrix"]]},
+"Multi-Cloud architecture": {d: "Designing consistent security controls across several cloud providers."},
+"Strategy and Guidelines": {d: "The cloud security strategy and reference architectures that teams are expected to follow."},
+"Cloud Security Posture Management (CSPM)": {d: "Tools that continuously detect misconfigurations and compliance drift in cloud accounts."},
+"Ownership/Liability/Incidents": {d: "Clarifying the shared responsibility model: what the provider secures and what remains your responsibility."},
+"SaaS Strategy": {d: "Evaluating and governing the SaaS applications that hold company data."},
+"Vendor's Financial Strength": {d: "Checking that a SaaS vendor is financially stable, so your data and service are not at risk if it fails."},
+"SLAs": {d: "Service level agreements covering availability, support and security incident notification."},
+"Infrastructure Audit": {d: "Reviewing the vendor's independent assurance, such as a SOC 2 Type II report or ISO 27001 certification."},
+"Proof of Application Security": {d: "Evidence that the vendor tests its application, such as penetration test summaries and a secure SDLC."},
+"Disaster Recovery Posture": {d: "The vendor's ability to restore service and data after an outage."},
+"Data ownership, compliance": {d: "Contract terms confirming you own your data, where it is stored, and how it is returned or deleted."},
+"Integration of Identity Management/Federation/SSO": {d: "Requiring SaaS apps to support SSO and automated provisioning (SCIM) so access is centrally controlled."},
+"SaaS Policy and Guidelines": {d: "Rules for approving and using SaaS, including which data classifications are allowed."},
+"Cloud log integration/APIs": {d: "Collecting cloud provider and SaaS logs through APIs into central monitoring."},
+"Virtualized security appliances": {d: "Firewalls and other security controls deployed as virtual appliances in cloud networks."},
+"Cloud-native apps security": {d: "Securing applications built on containers, Kubernetes and managed services, for example with CNAPP tools."},
+"Container-to-container communication security": {d: "Controlling and encrypting traffic between containers using network policies and mutual TLS."},
+"Service mesh, micro services": {d: "Using a service mesh to enforce identity, encryption and policy between microservices."},
+"Serverless computing security": {d: "Securing functions (such as AWS Lambda) with least-privilege roles, dependency scanning and input validation."},
+"Mobile Technologies": {d: "Managing the security of mobile devices and apps used for work.",
+  c: [["ISO/IEC 27001 A.8.1", "User endpoint devices"]]},
+"Lost/Stolen devices": {d: "Encryption, screen locks and remote wipe to protect data on lost or stolen devices."},
+"BYOD and MDM (Mobile Device Management)": {d: "Policies and tools for managing personal and corporate devices that access company data."},
+"Mobile Apps Inventory": {d: "Knowing which apps are installed on managed devices and blocking risky ones."},
+"Processes": {d: "Business processes where security steps must be built in."},
+"HR/On Boarding/Termination": {d: "Security steps when people join and leave: background checks, access provisioning and timely removal.",
+  c: [["ISO/IEC 27001 A.6.5", "Responsibilities after termination or change of employment"]]},
+"Business Partnerships": {d: "Securing data sharing and network connections with business partners."},
+"Agility, Business Continuity and Disaster Recovery": {d: "Helping the business recover and adapt quickly after disruption.",
+  c: [["NIST SP 800-34", "Contingency Planning Guide"]]},
+"Understand industry trends (e.g. retail, financials, etc)": {d: "Knowing sector-specific threats, regulations and business models in order to give relevant advice."},
+"Evaluating Emerging Technologies (Quantum, Crypto, GenAI etc.)": {d: "Assessing the risks and opportunities of new technologies before the business adopts them."},
+"Business Enablement > IOT": {d: "Securing Internet of Things deployments the business uses for new products or operations."},
+"IOT Frameworks": {d: "Guidance for IoT security, such as NIST IR 8259 and ETSI EN 303 645."},
+"Hardware/Devices security features": {d: "Secure boot, hardware roots of trust and tamper resistance built into devices."},
+"IOT Communication Protocols": {d: "Securing protocols like MQTT, Zigbee and Bluetooth LE, which often lack strong authentication by default."},
+"Device Identity, Auth and Integrity": {d: "Unique device credentials and verification that firmware has not been altered."},
+"Over the Air updates": {d: "Signed, secure update mechanisms so devices can be patched in the field."},
+"IOT Use cases": {d: "Business scenarios where IoT is deployed, each with its own risk profile."},
+"Track and Trace": {d: "Tracking goods and assets through the supply chain with connected tags."},
+"Condition Based Monitoring": {d: "Sensors that monitor equipment health to predict maintenance needs."},
+"Customer Experience": {d: "Connected products and in-store devices that interact with customers."},
+"Smart Grid": {d: "Connected energy infrastructure, where attacks can have physical and safety consequences."},
+"Smart Cities / Communities": {d: "Connected public infrastructure such as traffic control, lighting and utilities."},
+"Others ...": {d: "Other IoT scenarios specific to your business."},
+"IoT SaaS Platforms": {d: "Cloud platforms that manage IoT fleets. They concentrate risk and need strong access control."},
+"Augmented and Virtual Reality": {d: "AR/VR devices and platforms, which capture sensitive spatial, biometric and visual data."},
+"Edge Computing": {d: "Processing data close to where it is generated, which spreads the attack surface across many less-protected locations."},
+"Tools & Application based upon AI Technologies": {d: "Business adoption of AI-based products, which security must assess and enable safely."},
+
+// ───────── SDLC
+"SDLC and Project Delivery Lifecycle": {d: "Building security into every phase of projects and software development.",
+  c: [["ISO/IEC 27001 A.5.8", "Information security in project management"], ["NIST SP 800-218 (SSDF)", "Secure Software Development Framework"]]},
+"Embedding security in Project Requirements": {d: "Defining security and privacy requirements at the start of a project, when changes are cheapest.",
+  c: [["ISO/IEC 27001 A.8.26", "Application security requirements"]]},
+"Threat modeling and Design reviews": {d: "Identifying how a system could be attacked during design (for example with STRIDE) and adjusting the architecture.",
+  c: [["ISO/IEC 27001 A.8.27", "Secure system architecture and engineering principles"]]},
+"Security Testing": {d: "Verifying security before go-live with code scanning, dynamic testing and penetration tests.",
+  c: [["ISO/IEC 27001 A.8.29", "Security testing in development and acceptance"]]},
+"Certification and Accreditation": {d: "Formal approval that a system meets security requirements before it goes into operation, such as an Authority to Operate.",
+  c: [["NIST SP 800-37", "Risk Management Framework, including system authorization"]]},
+
+// ───────── Security Architecture
+"Security Architecture": {d: "The design principles and structures that make the environment secure by default.",
+  c: [["ISO/IEC 27001 A.8.27", "Secure system architecture and engineering principles"]]},
+"Traditional Network Segmentation": {d: "Dividing networks into zones (VLANs, DMZ) to limit how far an attacker can move.",
+  c: [["ISO/IEC 27001 A.8.22", "Segregation of networks"]]},
+"Micro segmentation strategy": {d: "Fine-grained segmentation down to individual workloads to contain lateral movement."},
+"Application protection": {d: "Architectural protections for applications, such as WAFs, API gateways and runtime protection."},
+"Defense-in-depth": {d: "Layering several independent controls so a single failure does not lead to compromise."},
+"Remote Access": {d: "Secure access for remote workers and third parties, increasingly through ZTNA instead of traditional VPN.",
+  c: [["ISO/IEC 27001 A.6.7", "Remote working"]]},
+"Encryption Technologies": {d: "Architectural choices for encryption at rest, in transit and in use, with centralized key management."},
+"Backup/Replication/Multiple Sites": {d: "Designing for resilience with data replication and geographically separate sites.",
+  c: [["ISO/IEC 27001 A.8.14", "Redundancy of information processing facilities"]]},
+"Cloud/Hybrid/Multiple Cloud Vendors": {d: "Architecture patterns that keep security consistent across on-premises and multiple clouds."},
+"Software Defined Networking": {d: "Programmable networks where security policy can be applied and changed centrally in software."},
+"Network Function Virtualization": {d: "Running network and security functions as software on standard hardware or in the cloud."},
+"Zero trust models and roadmap": {d: "A phased plan to move from implicit trust in the network to verifying every access request.",
+  c: [["NIST SP 800-207", "Zero Trust Architecture"], ["CISA Zero Trust Maturity Model", "Maturity stages across identity, devices, networks, applications and data"]]},
+"Zero trust access to applications": {d: "Granting per-application access based on identity and device posture (ZTNA) rather than network location."},
+"SASE/SSE strategy, vendors": {d: "Secure Access Service Edge / Security Service Edge: cloud-delivered web gateway, CASB, ZTNA and firewall in one platform."},
+"Overlay networks, secure enclaves": {d: "Isolated encrypted networks and hardware-protected execution environments for sensitive workloads."},
+"Quantum Strategy and Planning": {d: "Inventorying where cryptography is used and planning migration to post-quantum algorithms, ahead of 'harvest now, decrypt later' attacks.",
+  c: [["NIST FIPS 203/204/205", "Post-quantum cryptography standards"], ["NIST IR 8547", "Proposed timeline: quantum-vulnerable algorithms deprecated by 2030 and disallowed by 2035"]]},
+
+// ───────── Compliance and Audits
+"Compliance and Audits": {d: "Meeting legal, regulatory and contractual security requirements, and proving it through audits.",
+  c: [["ISO/IEC 27001 A.5.36", "Compliance with policies, rules and standards for information security"]]},
+"CCPA, GDPR & other data privacy laws": {d: "Privacy laws governing how personal data is collected and used, individuals' rights, and breach notification.",
+  c: [["GDPR Art. 32", "Security of processing appropriate to the risk"], ["CCPA/CPRA", "California consumer privacy rights and reasonable security duties"]]},
+"PCI": {d: "Payment Card Industry Data Security Standard, for anyone who stores, processes or transmits card data.",
+  c: [["PCI DSS v4.0.1", "Current version; its future-dated requirements became mandatory on 31 March 2025"]]},
+"SOX": {d: "Sarbanes-Oxley Act: IT general controls over systems that support financial reporting.",
+  c: [["SOX §404", "Management assessment of internal control over financial reporting, including ITGCs"]]},
+"HIPAA/HITECH & HITRUST": {d: "US healthcare rules for protecting health information, plus the certifiable HITRUST framework.",
+  c: [["HIPAA Security Rule (45 CFR 164 Subpart C)", "Administrative, physical and technical safeguards for electronic health information"]]},
+"Regular Audits": {d: "Scheduled internal and external audits that verify controls operate as intended.",
+  c: [["ISO/IEC 27001 Cl. 9.2", "Internal audit at planned intervals"]]},
+"SSAE 18": {d: "The US attestation standard behind the SOC 1 and SOC 2 reports that service providers give their customers."},
+"NIST/FISMA, CMMC": {d: "Federal and defense contractor requirements based on NIST SP 800-53 and SP 800-171.",
+  c: [["NIST SP 800-171", "Protecting Controlled Unclassified Information in nonfederal systems"]]},
+"DORA": {d: "EU Digital Operational Resilience Act for financial entities, applicable since 17 January 2025.",
+  c: [["DORA", "ICT risk management, incident reporting, resilience testing and ICT third-party risk"]]},
+"SEC notification requirements": {d: "US public companies must disclose material cybersecurity incidents promptly.",
+  c: [["SEC Form 8-K Item 1.05", "Disclose a material cybersecurity incident within four business days of determining materiality"]]},
+"Other compliance needs": {d: "Industry, country and customer-specific requirements, such as NIS2, US state laws or contractual security clauses."},
+
+// ───────── Legal
+"Legal": {d: "The legal side of security work, handled closely with counsel."},
+"Data Discovery and Data Ownership": {d: "Knowing where data lives and who is responsible for it, which underpins legal holds, privacy requests and breach scoping."},
+"Vendor Contracts": {d: "Security, audit, breach notification and liability clauses in supplier contracts.",
+  c: [["ISO/IEC 27001 A.5.20", "Addressing information security within supplier agreements"]]},
+"Investigations/Forensics": {d: "Internal investigations and forensic work carried out to legal standards so that evidence holds up."},
+"Attorney-Client Privileges": {d: "Running incident investigations under counsel's direction to protect sensitive findings where possible."},
+"Data Retention and Destruction": {d: "Keeping data only as long as required and destroying it securely afterwards.",
+  c: [["ISO/IEC 27001 A.8.10", "Information deletion"], ["NIST SP 800-88", "Guidelines for Media Sanitization"]]},
+
+// ───────── Risk Management
+"Risk Management": {d: "Identifying, assessing, treating and monitoring security risks so leadership can make informed decisions.",
+  c: [["ISO/IEC 27005", "Guidance on managing information security risks"], ["NIST SP 800-30", "Guide for Conducting Risk Assessments"]]},
+"Use of Risk Assessment Methodology and framework": {d: "Applying one consistent, repeatable method so that risks can be compared and tracked over time."},
+"Third party risk management (TPRM) automation": {d: "Assessing and monitoring vendors at scale with automated questionnaires, evidence collection and external ratings.",
+  c: [["ISO/IEC 27001 A.5.19–5.22", "Supplier relationships, agreements, ICT supply chain and monitoring"], ["CIS Controls v8 15", "Service provider management"]]},
+"Cyber Risk Quantification (CRQ), single risk dashboard": {d: "Expressing cyber risk in financial terms and presenting it in a single view for decision makers."},
+"Maintain Centralized Risk Register": {d: "One list of risks, each with an owner, rating, treatment plan and status.",
+  c: [["ISO/IEC 27001 Cl. 6.1.3", "Risk treatment plan and Statement of Applicability"]]},
+"Risk Management > Vulnerability Management": {d: "Using vulnerability data as a risk input, linking technical findings to business risk."},
+"Ongoing risk assessments/pen testing": {d: "Regular assessments and penetration tests to find new risks as the environment changes.",
+  c: [["PCI DSS v4.0 11.4", "Internal and external penetration testing at least every 12 months and after significant changes"]]},
+"Code Reviews, SAST": {d: "Static analysis and code review as ongoing risk controls for in-house software."},
+"Policies and Procedures": {d: "The documented rules and how-to procedures that put risk decisions into practice."},
+"Phishing and Associate Awareness": {d: "Measuring and reducing human risk with phishing simulations and targeted training."},
+"Data Centric Approach": {d: "Protecting the data itself wherever it goes, rather than only the systems around it.",
+  c: [["CIS Controls v8 3", "Data protection"]]},
+"Data Discovery": {d: "Automatically finding sensitive data across endpoints, servers, cloud storage and SaaS."},
+"Data Classification": {d: "Labeling data by sensitivity (e.g. public, internal, confidential) to drive how it is protected.",
+  c: [["ISO/IEC 27001 A.5.12–5.13", "Classification and labelling of information"]]},
+"Access Control": {d: "Limiting access to data to those with a business need.",
+  c: [["ISO/IEC 27001 A.8.3", "Information access restriction"]]},
+"Data Loss Prevention - DLP": {d: "Preventing sensitive data from leaving through unauthorized channels.",
+  c: [["ISO/IEC 27001 A.8.12", "Data leakage prevention"]]},
+"Customer and Partner Access": {d: "Controlling and monitoring external parties' access to your data."},
+"Encryption/Masking": {d: "Encrypting sensitive data, and masking or tokenizing it in test and analytics environments.",
+  c: [["ISO/IEC 27001 A.8.11", "Data masking"]]},
+"Monitoring and Alerting": {d: "Detecting unusual access to or movement of sensitive data."},
+"Operational Technologies": {d: "Risk in systems that control physical processes in manufacturing, energy and utilities, where safety and availability come first.",
+  c: [["NIST SP 800-82r3", "Guide to Operational Technology Security"], ["IEC 62443", "Industrial automation and control system security"]]},
+"Industrial Control Systems": {d: "The systems that control industrial processes; downtime can mean safety incidents, not just lost data."},
+"PLCs": {d: "Programmable logic controllers that directly operate machinery; many lack authentication."},
+"SCADA": {d: "Supervisory control systems that monitor and control distributed industrial assets."},
+"HMIs": {d: "Human-machine interfaces operators use to control processes, often running outdated Windows versions."},
+"Risk Management > Physical Security": {d: "Protecting facilities, equipment and people, which in turn protects information systems.",
+  c: [["ISO/IEC 27001 A.7", "Physical controls"]]},
+"Loss, Fraud prevention": {d: "Reducing financial loss from fraud, theft and abuse, often together with fraud and finance teams."},
+
+// ───────── Automation and Analytics
+"Automation and Analytics": {d: "Using automation and data to scale security without growing headcount at the same rate."},
+"Use AI as an automation tool": {d: "Using AI agents and assistants to automate security workflows end to end."},
+"Automate patching": {d: "Automatic patch deployment with testing rings, reducing the time systems stay exposed."},
+"Secure DevOps, DevSecOps": {d: "Building security practices and tools into DevOps workflows so teams ship secure code by default."},
+"Embedding security tools in CI/CD pipelines": {d: "Running code, dependency, secret and infrastructure-as-code scans automatically on every build.",
+  c: [["Requirement", "Define pipeline gates: builds with critical findings or exposed secrets do not deploy"]]},
+"Automate threat hunting": {d: "Scheduled, automated hunts that re-run proven hypotheses continuously."},
+"Automate risk scoring": {d: "Calculating risk scores automatically from asset, vulnerability and threat data."},
+"Automate asset inventory": {d: "Continuously discovering assets from many sources instead of maintaining manual lists."},
+"Secure infrastructure as code": {d: "Scanning Terraform and similar templates for misconfigurations before anything is deployed."},
+"Automate API inventory": {d: "Discovering APIs automatically from traffic and code to find undocumented or shadow APIs."},
+"Automate risk register": {d: "Keeping the risk register current from live data rather than annual workshops."},
+"Automate security metrics": {d: "Generating dashboards directly from source systems instead of manual spreadsheets."},
+"Automate incident response where applicable": {d: "Automating containment for well-understood incidents, keeping human approval for high-impact actions."},
+"Automate compliance checks": {d: "Continuous control monitoring that collects audit evidence automatically."}
+};
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+// Árbol: dos espacios por nivel. Las ramas de nivel 1 siguen el orden de colores --b0..--b11.
+const SRC = `
+Security Operations
+  Threat Prevention (NIST CSF Identify & Protect)
+    Asset Management
+    Network/Application Firewalls
+    Vulnerability Management
+      Scope
+        Operating Systems
+        Network Devices
+        Applications
+        Databases
+        Code Review
+        Physical Security
+        Cloud misconfiguration testing
+        Mobile Devices & Apps
+        Containers
+        Attack surface management
+        IoT
+        OT/SCADA
+      Identify (periodic or continuous)
+      Classify & prioritize
+        Risk Based Approach
+        Prioritize (e.g. use of EPSS)
+      Mitigation (Fix, verify, false positive)
+      Measure
+        Baseline
+        Metrics
+    Web Application Security
+      Application Development Standards
+      Secure Code Training and Review
+      Application Vulnerability Testing
+      Change Control, File Integrity Monitoring
+      Web Application Firewall
+      Integration to SDLC and Project Delivery
+      Inventory open source components
+      Source code supply chain security
+      API Security
+    Network IPS and IDS
+    Identity Management
+    DLP
+    Anti Malware, Anti-spam
+    Proxy/Content Filtering
+    DNS security/filtering
+    Patching
+    DDoS Protection
+    Hardening guidelines
+    Desktop and mobile security
+    Encryption, SSL, PKI, Quantum Safe Encryption
+    Security Health Checks
+    Public software repositories, Supply chain
+    Awareness training
+  Threat Detection (NIST CSF Detect)
+    Log Analysis/correlation/SIEM, SOAR, AI Agents
+    Alerting (IDS/IPS, FIM, WAF, Anti Malware, etc)
+    NetFlow analysis
+    DLP
+    Threat hunting and insider threat
+    MSSP integration
+    Threat Detection capability assessment
+      Gap assessment
+      Prioritization to fill gaps
+    SOC Operations
+      SOC Resource Mgmt
+      SOC Staff continuous training
+      Shift management
+      SOC procedures
+      SOC Metrics and Reports
+      SOC and NOC Integration
+      SOC Tech stack management
+      SOC DR exercise
+      Partnerships with ISACs
+      Long term trend analysis
+      Unstructured data from IoT
+      Integrate new data sources (see areas under skills development)
+      Skills Development
+        AI, Machine Learning Skill Development
+        Understand Algorithm Biases
+        IOT
+        Autonomous Vehicles
+        Drones
+        Medical Devices
+        Industrial Control Systems (ICS)
+        MITRE ATT&CK
+        Soft skills
+      DevOps Integration
+      Prepare for unplanned work
+      Manage data process cost
+    Use of AI, GenAI and Data Analytics
+      Use of computer vision in physical security
+      Log Anomaly Detection
+      ML model training, retraining
+    Red team/blue team exercises
+    Integrate threat intelligence platform (TIP)
+    Deception technologies for breach detection
+    Full packet inspection
+    Detect misconfigurations
+    Integrate Cloud based tools
+  Incident Management (NIST CSF Respond & Recover)
+    Create adequate Incident Response capability
+    Incident Response Playbooks
+    Incident Readiness Assessment
+    Forensic Investigation
+    Data Breach Preparation
+      Update and Test Incident Response Plan
+      Set Leadership Expectations
+      Forensic and IR Partner, retainer
+      Adequate Logging
+      Breach exercises (e.g. simulations)
+      First responders Training
+      IR Playbook testing
+      Media Relations
+      Business Continuity Planning
+    Ransomware
+      Identify critical systems
+      Perform ransomware BIA
+      Tie with BC/DR Plans
+      Devise containment strategy
+      Ensure adequate backups
+      Periodic backup test
+      Offline backups in case backup is ransomed
+      Mock exercises
+      Implement machine integrity checking
+    Automation and SOAR
+      Playbooks
+    Supply chain incident mgmt
+      Keep inventory of software components
+      Integrate into vulnerability mgmt
+      Integrate into SDLC and risk mgmt process
+      AI Models, Agents, Tools
+    Managing relationships with law enforcement
+    Post-incident analysis & future avoidance of similar incidents
+    Cyber Risk Insurance
+Using and Securing AI
+  Securing AI
+    AI Policies, Governance and Transparency
+    AI Frameworks (Google, NIST, Databricks, IBM, etc.)
+    Ethical and Responsible use of AI
+    LLMs, Chatbots, Agents, RAG
+    Protecting Intellectual Property
+    Agentic AI frameworks
+    New vulnerabilities and risks introduced by AI, Adversarial attacks
+      OWASP Top 10 for LLMs
+      AI Model Red Teaming
+      MCP, A2A and other AI protocols
+      AI Models and Supply Chain Risks
+    Agentic AI and Tools
+    AI Application security testing
+    AI Sovereignty, data lakes
+    Human in the loop strategies
+    Security of RAG/Vector databases
+    Third party AI tools
+  Using AI
+    Train InfoSec teams on AI technologies
+    Automated pen testing
+    AI threat hunting
+    SOC AI agents
+    Source code scanning
+    Automating routine tasks
+    Staff training and research
+    AI for threat modeling
+    AI gateways
+Governance
+  Strategy and business alignment
+  Security policies, standards
+  Legal, regulatory and contract
+  Risk Mgmt/Control Frameworks (a typical organization will choose a subset of these)
+    NIST - relevant NIST standards
+    ISO
+    COSO
+    COBIT
+    ITIL
+    FAIR
+    FISMA
+    CMMC
+    Visibility across multiple frameworks
+  Roles and Responsibilities (RACI charts)
+  Data Ownership, sharing, and data privacy
+  Conflict Management
+  Metrics and Reporting
+    Operational Metrics
+    Executive Metrics
+    Validating effectiveness of metrics
+  IT, OT, IoT/IIoT Convergence
+  Explore options for cooperative SOC, collaborative infosec
+  Tools and vendors consolidation
+  Evaluating control effectiveness
+  Maintaining a roadmap/plan for 1-3 years
+  Board oversight and board presentations
+Identity and Access Management
+  Identity Credentialing
+  User Provisioning and Identity Life Cycle Management
+  Single Sign On (SSO, Simplified sign on)
+  Repository (LDAP/Active Directory, Cloud Identity, Local ID stores)
+  Federation, SAML, Shibboleth
+  2-Factor (multi-factor) Authentication - MFA
+    Authenticator Apps
+    Tokens and cards
+    One time passcodes
+  Role-Based Access Control (RBAC)
+  Customer Identity - Ecommerce and Mobile Apps
+  Password resets/self-service
+  HR Process Integration
+  Integrating cloud-based identities
+  IoT device identities
+  IAM SaaS solutions
+  Unified identity profiles
+  Password-less authentication
+    Voice signatures
+    Face recognition
+    Passkey
+  IAM with Zero Trust technologies
+  Privileged Access Management (PAM)
+  Use of public identity (Google, FB etc.)
+    OAuth
+    OpenID
+  Digital Certificates
+  API authentication and secrets management
+  AI Agent Identity
+Team Management
+  Manage Infosec Budget
+    Managing Security Projects
+    Business Case Development
+    Alignment with IT Projects
+    Balancing budget for People, Training, and Tools/Technology/Hardware, travel, conferences
+    Consulting and outsourcing
+    CapEx and OpEx considerations
+    Technology amortization
+    Retire redundant & under utilized tools
+  Security Team Branding
+    Aligning with Corporate Objectives
+    Continuous Mgmt Updates, metrics
+    Negotiation, give and take
+    Corporate politics, picking battles carefully
+    Innovation and Value Creation
+    Expectations Management
+    Show progress/risk reduction
+    Return on Security Investment (ROSI)
+  Staffing and Talent Management
+    Recruiting, performance and retention
+    Staff burnout prevention
+    Balance FTE and contractors
+    Staff training and skills update
+Business Enablement
+  Mergers and Acquisitions
+    Acquisition Risk Assessment
+    Network/Application/Cloud Integration Cost
+    IAM integration
+    Security tools rationalization
+  Cloud Computing
+    Multi-Cloud architecture
+    Strategy and Guidelines
+    Cloud Security Posture Management (CSPM)
+    Ownership/Liability/Incidents
+    SaaS Strategy
+      Vendor's Financial Strength
+      SLAs
+      Infrastructure Audit
+      Proof of Application Security
+      Disaster Recovery Posture
+      Data ownership, compliance
+      Integration of Identity Management/Federation/SSO
+      SaaS Policy and Guidelines
+    Cloud log integration/APIs
+    Virtualized security appliances
+    Cloud-native apps security
+    Container-to-container communication security
+    Service mesh, micro services
+    Serverless computing security
+  Mobile Technologies
+    Lost/Stolen devices
+    BYOD and MDM (Mobile Device Management)
+    Mobile Apps Inventory
+  Processes
+    HR/On Boarding/Termination
+    Business Partnerships
+  Agility, Business Continuity and Disaster Recovery
+  Understand industry trends (e.g. retail, financials, etc)
+  Evaluating Emerging Technologies (Quantum, Crypto, GenAI etc.)
+  IOT
+    IOT Frameworks
+    Hardware/Devices security features
+    IOT Communication Protocols
+    Device Identity, Auth and Integrity
+    Over the Air updates
+    IOT Use cases
+      Track and Trace
+      Condition Based Monitoring
+      Customer Experience
+      Smart Grid
+      Smart Cities / Communities
+      Others ...
+    IoT SaaS Platforms
+  Augmented and Virtual Reality
+  Edge Computing
+  Tools & Application based upon AI Technologies
+SDLC and Project Delivery Lifecycle
+  Embedding security in Project Requirements
+  Threat modeling and Design reviews
+  Security Testing
+  Certification and Accreditation
+Security Architecture
+  Traditional Network Segmentation
+  Micro segmentation strategy
+  Application protection
+  Defense-in-depth
+  Remote Access
+  Encryption Technologies
+  Backup/Replication/Multiple Sites
+  Cloud/Hybrid/Multiple Cloud Vendors
+  Software Defined Networking
+  Network Function Virtualization
+  Zero trust models and roadmap
+  Zero trust access to applications
+  SASE/SSE strategy, vendors
+  Overlay networks, secure enclaves
+  Quantum Strategy and Planning
+Compliance and Audits
+  CCPA, GDPR & other data privacy laws
+  PCI
+  SOX
+  HIPAA/HITECH & HITRUST
+  Regular Audits
+  SSAE 18
+  NIST/FISMA, CMMC
+  DORA
+  SEC notification requirements
+  Other compliance needs
+Legal
+  Data Discovery and Data Ownership
+  Vendor Contracts
+  Investigations/Forensics
+  Attorney-Client Privileges
+  Data Retention and Destruction
+Risk Management
+  Use of Risk Assessment Methodology and framework
+  Third party risk management (TPRM) automation
+  Cyber Risk Quantification (CRQ), single risk dashboard
+  Maintain Centralized Risk Register
+  Vulnerability Management
+  Ongoing risk assessments/pen testing
+  Code Reviews, SAST
+  Policies and Procedures
+  Phishing and Associate Awareness
+  Data Centric Approach
+    Data Discovery
+    Data Classification
+    Access Control
+    Data Loss Prevention - DLP
+    Customer and Partner Access
+    Encryption/Masking
+    Monitoring and Alerting
+  Operational Technologies
+    Industrial Control Systems
+    PLCs
+    SCADA
+    HMIs
+  Physical Security
+  Loss, Fraud prevention
+Automation and Analytics
+  Use AI as an automation tool
+  Automate patching
+  Secure DevOps, DevSecOps
+  Embedding security tools in CI/CD pipelines
+  Automate threat hunting
+  Automate risk scoring
+  Automate asset inventory
+  Secure infrastructure as code
+  Automate API inventory
+  Automate risk register
+  Automate security metrics
+  Automate incident response where applicable
+  Automate compliance checks
+`;
+const RIGHT_COUNT = 4; // las primeras 4 ramas van a la derecha, como en el original
+
+// ---------- parseo ----------
+let uid = 0;
+const root = {id: uid++, name: "CISO MindMap 2026", sub: "InfoSec Professionals Responsibilities", kids: [], open: true, depth: 0, parent: null};
+{
+  const stack = [root];
+  SRC.split("\n").forEach(raw => {
+    if (!raw.trim()) return;
+    const depth = (raw.match(/^ */)[0].length / 2) + 1;
+    const node = {id: uid++, name: raw.trim(), kids: [], open: false, depth};
+    while (stack.length > depth) stack.pop();
+    const parent = stack[stack.length - 1];
+    node.parent = parent; parent.kids.push(node); stack.push(node);
+  });
+}
+const all = [];
+(function walk(n, branch){
+  if (n.depth === 1) branch = root.kids.indexOf(n);
+  n.branch = branch; all.push(n);
+  n.kids.forEach(k => walk(k, branch));
+  n.count = n.kids.reduce((s, k) => s + 1 + k.count, 0);
+})(root, -1);
+root.kids.forEach((b, i) => b.side = i < RIGHT_COUNT ? 1 : -1);
+all.forEach(n => { if (n.depth > 1) n.side = n.parent.side; });
+all.forEach(n => { n.info = (n.parent && INFO[n.parent.name + " > " + n.name]) || INFO[n.name] || {d: ""}; });
+
+// ---------- medición y ajuste de líneas ----------
+const ctx = document.createElement("canvas").getContext("2d");
+const LINE = 15, PADX = 9, PADY = 6, MAXW = 250;
+function measure(){
+  all.forEach(n => {
+    if (n === root){ n.lines = ["CISO MindMap 2026", "InfoSec Professionals", "Responsibilities"]; n.w = 210; n.h = 3*19 + 16; return; }
+    ctx.font = (n.depth === 1 ? "600 13px " : "400 12px ") + '"IBM Plex Sans", system-ui, sans-serif';
+    const words = n.name.split(" "); const lines = []; let cur = "";
+    words.forEach(w => { const t = cur ? cur + " " + w : w; if (ctx.measureText(t).width > MAXW && cur){ lines.push(cur); cur = w; } else cur = t; });
+    lines.push(cur);
+    n.lines = lines;
+    const tw = Math.max(...lines.map(l => ctx.measureText(l).width));
+    n.w = Math.ceil(tw) + PADX*2 + (n.kids.length ? 22 : 0);
+    n.h = lines.length * LINE + PADY*2 + (n.depth === 1 ? 4 : 0);
+  });
+}
+
+// ---------- layout bilateral ----------
+const GAP = 46;
+function layout(){
+  [1, -1].forEach(side => {
+    const branches = root.kids.filter(b => b.side === side);
+    const h = d3.hierarchy({ref: root, kids: branches}, d => {
+      if (d.ref === root) return d.kids.map(k => ({ref: k}));
+      return d.ref.open ? d.ref.kids.map(k => ({ref: k})) : null;
+    });
+    d3.tree().nodeSize([1, 1]).separation((a, b) =>
+      (a.data.ref.h + b.data.ref.h) / 2 + (a.parent === b.parent ? 7 : 16))(h);
+    const maxW = [];
+    h.each(d => { maxW[d.depth] = Math.max(maxW[d.depth] || 0, d.data.ref.w); });
+    const col = [0, root.w/2 + GAP];
+    for (let i = 2; i < maxW.length; i++) col[i] = col[i-1] + maxW[i-1] + GAP;
+    h.each(d => {
+      const n = d.data.ref; if (n === root) return;
+      n.cy = d.x; n.visible = true;
+      n.left = side === 1 ? col[d.depth] : -col[d.depth] - n.w;
+    });
+  });
+  root.cy = 0; root.left = -root.w/2; root.visible = true;
+}
+function visibleNodes(){
+  const out = [];
+  (function w(n){ out.push(n); if (n.open) n.kids.forEach(w); })(root);
+  return out;
+}
+const inEdge = n => n.side === 1 ? n.left : n.left + n.w;
+const outEdge = n => n === root ? (0) : (n.side === 1 ? n.left + n.w : n.left);
+function linkPath(p, c){
+  const x0 = p === root ? c.side * root.w/2 : outEdge(p), y0 = p.cy, x1 = inEdge(c), y1 = c.cy;
+  const mx = (x0 + x1) / 2;
+  return `M${x0},${y0}C${mx},${y0} ${mx},${y1} ${x1},${y1}`;
+}
+
+// ---------- render ----------
+const svg = d3.select("#map");
+const viewport = svg.append("g");
+const gLinks = viewport.append("g"), gNodes = viewport.append("g");
+const zoom = d3.zoom().scaleExtent([0.15, 2.5]).on("zoom", e => viewport.attr("transform", e.transform));
+svg.call(zoom).on("dblclick.zoom", null);
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const DUR = reduced ? 0 : 320;
+const col = n => `var(--b${n.branch})`;
+
+function render(){
+  layout();
+  const nodes = visibleNodes();
+  const t = svg.transition().duration(DUR);
+
+  const links = gLinks.selectAll("path.link").data(nodes.filter(n => n !== root), n => n.id);
+  links.enter().append("path").attr("class", "link")
+      .attr("stroke", col)
+      .attr("d", n => { const p = n.parent; const px = p === root ? n.side*root.w/2 : outEdge(p); return `M${px},${p.cy}L${px},${p.cy}`; })
+    .merge(links).transition(t).attr("d", n => linkPath(n.parent, n));
+  links.exit().transition(t).style("opacity", 0).remove();
+
+  const sel = gNodes.selectAll("g.node").data(nodes, n => n.id);
+  const enter = sel.enter().append("g")
+      .attr("class", n => "node d" + Math.min(n.depth, 2) + (n === root ? " root" : ""))
+      .attr("tabindex", 0)
+      .attr("role", "button")
+      .attr("transform", n => { if (n === root) return `translate(${root.left},${-root.h/2})`; const p = n.parent; return `translate(${(p === root ? n.side*root.w/2 : outEdge(p)) - (n.side === -1 ? n.w : 0)},${p.cy - n.h/2})`; })
+      .style("opacity", 0)
+      .on("click", (e, n) => activate(n))
+      .on("keydown", (e, n) => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); activate(n); } });
+
+  enter.append("rect").attr("class", "box").attr("rx", n => n === root ? 10 : 5)
+    .attr("width", n => n.w).attr("height", n => n.h)
+    .style("fill", n => n === root ? "var(--fg)" : n.depth === 1 ? `color-mix(in srgb, ${col(n)} 22%, var(--surface))` : `color-mix(in srgb, ${col(n)} 7%, var(--surface))`)
+    .style("stroke", n => n === root ? "var(--fg)" : col(n));
+  enter.append("text").each(function(n){
+    const txt = d3.select(this);
+    if (n === root){
+      txt.style("fill", "var(--surface)").attr("text-anchor", "middle");
+      n.lines.forEach((l, i) => txt.append("tspan").attr("x", n.w/2).attr("y", 8 + 19*(i+1) - 3)
+        .style("font-size", i === 0 ? "17px" : "13px").style("font-weight", i === 0 ? 700 : 500).text(l));
+      return;
+    }
+    const off = n.depth === 1 ? 2 : 0;
+    n.lines.forEach((l, i) => txt.append("tspan").attr("x", PADX).attr("y", PADY + off + LINE*(i+1) - 3.5).text(l));
+  });
+  enter.filter(n => n.kids.length && n !== root).append("g").attr("class", "badge")
+    .attr("transform", n => `translate(${n.w - 16},${n.h/2})`)
+    .call(g => { g.append("circle").attr("r", 8).style("fill", col); g.append("text").attr("text-anchor", "middle").attr("dy", "0.34em"); });
+  enter.filter(n => n !== root && n.info.c).append("circle").attr("class", "ctl").attr("cx", 4.5).attr("cy", 4.5).attr("r", 2.6);
+  enter.append("title").text(n => n === root ? n.info.d : n.name + (n.kids.length ? ` — ${n.count} topics` : "") + (n.info.d ? "\n\n" + n.info.d : ""));
+
+  const merged = enter.merge(sel);
+  merged.classed("sel", n => n === selected);
+  merged.select(".badge text").text(n => n.open ? "–" : (n.count > 99 ? "99+" : n.count))
+    .style("font-size", n => (!n.open && n.count > 9) ? "8.5px" : "10px");
+  merged.attr("aria-expanded", n => n.kids.length ? String(n.open) : null)
+    .attr("aria-label", n => n.name + (n.kids.length ? (n.open ? ", expanded" : `, collapsed, ${n.count} topics`) : ""));
+  merged.transition(t).style("opacity", 1).attr("transform", n => `translate(${n.left},${n.cy - n.h/2})`);
+  sel.exit().transition(t).style("opacity", 0).remove();
+  applySearchClasses();
+}
+
+function toggle(n){
+  if (!n.kids.length || n === root) return;
+  n.open = !n.open;
+  render();
+}
+
+// ---------- detail panel ----------
+let selected = null;
+const infoEl = document.getElementById("info");
+function activate(n){
+  // First click on a closed branch opens it; clicking the selected, open branch closes it.
+  if (n !== root && n.kids.length && (!n.open || n === selected)) n.open = !n.open;
+  selected = n;
+  render();
+  showInfo(n);
+}
+function showInfo(n){
+  const path = []; let p = n.parent; while (p){ path.unshift(p.name); p = p.parent; }
+  document.getElementById("crumb").innerHTML = "";
+  path.forEach(t => { const s = document.createElement("span"); s.textContent = t; document.getElementById("crumb").append(s); });
+  const h = document.getElementById("infoTitle");
+  h.textContent = n === root ? "CISO MindMap 2026" : n.name;
+  h.style.setProperty("--bc", n === root ? "var(--fg)" : `var(--b${n.branch})`);
+  document.getElementById("infoDesc").textContent = n.info.d;
+  const list = document.getElementById("ctlList"); list.innerHTML = "";
+  (n.info.c || []).forEach(([ref, txt]) => {
+    const li = document.createElement("li");
+    const r = document.createElement("span"); r.className = "ref"; r.textContent = ref;
+    const t = document.createElement("span"); t.className = "txt"; t.textContent = txt;
+    li.append(r, t); list.append(li);
+  });
+  document.getElementById("ctls").hidden = !(n.info.c && n.info.c.length);
+  const foot = document.getElementById("infoFoot"); foot.innerHTML = "";
+  if (n !== root && n.kids.length){
+    const b = document.createElement("button"); b.type = "button";
+    b.textContent = n.open ? `Collapse ${n.kids.length} subtopics` : `Expand ${n.kids.length} subtopics`;
+    b.onclick = () => { n.open = !n.open; render(); showInfo(n); };
+    foot.append(b);
+  }
+  if (n.parent){
+    const b = document.createElement("button"); b.type = "button";
+    b.textContent = "↑ " + (n.parent === root ? "Overview" : n.parent.name.length > 34 ? n.parent.name.slice(0, 32) + "…" : n.parent.name);
+    b.onclick = () => { selected = n.parent; render(); showInfo(n.parent); };
+    foot.append(b);
+  }
+  foot.hidden = !foot.children.length;
+  infoEl.hidden = false;
+  infoEl.scrollTop = 0;
+}
+document.getElementById("infoClose").onclick = () => { infoEl.hidden = true; selected = null; render(); };
+document.addEventListener("keydown", e => { if (e.key === "Escape" && document.activeElement !== q && !infoEl.hidden){ document.getElementById("infoClose").click(); } });
+
+function bounds(){
+  const ns = visibleNodes();
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  ns.forEach(n => { x0 = Math.min(x0, n.left); x1 = Math.max(x1, n.left + n.w); y0 = Math.min(y0, n.cy - n.h/2); y1 = Math.max(y1, n.cy + n.h/2); });
+  return {x0, x1, y0, y1};
+}
+function fit(animate = true){
+  const {width, height} = svg.node().getBoundingClientRect();
+  const b = bounds(), pad = 40;
+  const k = Math.min(1.1, (width - pad*2) / (b.x1 - b.x0), (height - pad*2) / (b.y1 - b.y0));
+  const tr = d3.zoomIdentity.translate(width/2 - k*(b.x0 + b.x1)/2, height/2 - k*(b.y0 + b.y1)/2).scale(k);
+  (animate && !reduced ? svg.transition().duration(450) : svg).call(zoom.transform, tr);
+}
+function centerOn(n){
+  const {width, height} = svg.node().getBoundingClientRect();
+  const k = Math.max(d3.zoomTransform(svg.node()).k, 0.9);
+  const tr = d3.zoomIdentity.translate(width/2 - k*(n.left + n.w/2), height/2 - k*n.cy).scale(k);
+  (reduced ? svg : svg.transition().duration(450)).call(zoom.transform, tr);
+}
+
+// ---------- búsqueda ----------
+const q = document.getElementById("q"), countEl = document.getElementById("count");
+let hits = [], cursor = -1;
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+function applySearchClasses(){
+  const ids = new Set(hits.map(h => h.id));
+  svg.classed("dimmed", hits.length > 0);
+  gNodes.selectAll("g.node").classed("hit", n => ids.has(n.id)).classed("current", n => hits[cursor] && hits[cursor].id === n.id);
+}
+function runSearch(){
+  const term = norm(q.value.trim());
+  hits = []; cursor = -1;
+  if (term.length >= 2){
+    hits = all.filter(n => n !== root && norm(n.name).includes(term));
+    hits.forEach(h => { let p = h.parent; while (p){ p.open = true; p = p.parent; } });
+  }
+  countEl.textContent = term.length >= 2 ? (hits.length ? `${hits.length}` : "0") : "";
+  render();
+  if (hits.length) setTimeout(() => fit(), DUR);
+}
+let deb;
+q.addEventListener("input", () => { clearTimeout(deb); deb = setTimeout(runSearch, 180); });
+q.addEventListener("keydown", e => {
+  if (e.key === "Enter" && hits.length){
+    e.preventDefault();
+    cursor = (cursor + 1) % hits.length;
+    countEl.textContent = `${cursor + 1}/${hits.length}`;
+    applySearchClasses(); centerOn(hits[cursor]);
+    selected = hits[cursor]; gNodes.selectAll("g.node").classed("sel", n => n === selected); showInfo(selected);
+  }
+  if (e.key === "Escape"){ q.value = ""; runSearch(); }
+});
+
+// ---------- controles ----------
+document.getElementById("expand").onclick = () => { all.forEach(n => n.open = n.kids.length > 0 || n === root); render(); setTimeout(() => fit(), DUR); };
+document.getElementById("collapse").onclick = () => { all.forEach(n => n.open = n === root); q.value = ""; hits = []; countEl.textContent = ""; render(); setTimeout(() => fit(), DUR); };
+document.getElementById("fit").onclick = () => fit();
+if (innerWidth < 640) document.getElementById("focus").open = false;
+
+function start(){ measure(); render(); fit(false); }
+(document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(start, start);
+</script>
+
+</body>
+</html>
